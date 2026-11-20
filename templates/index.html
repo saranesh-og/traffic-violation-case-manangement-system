@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Violation Case Management System (TVCMS)</title>
+  <!-- Modern Inter Font & Phosphor Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Header / Top Bar -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-badge">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <span class="system-title">TVCMS <span class="badge-dept">TRAFFIC ENFORCEMENT &amp; ADJUDICATION</span></span>
+          <span class="system-subtitle">Municipal Traffic Violation Case &amp; Evidence Management Portal</span>
+        </div>
+      </div>
+
+      <div class="nav-quick-stats" id="navQuickStats">
+        <div class="stat-pill">
+          <span class="label">ACTIVE CASES:</span>
+          <span class="val" id="pillActiveCases">--</span>
+        </div>
+        <div class="stat-pill highlight">
+          <span class="label">PENDING REVIEW:</span>
+          <span class="val" id="pillPendingReview">--</span>
+        </div>
+        <div class="stat-pill success">
+          <span class="label">SETTLED:</span>
+          <span class="val" id="pillSettled">--</span>
+        </div>
+        <div class="stat-pill currency">
+          <span class="label">COLLECTED:</span>
+          <span class="val" id="pillCollected">$0.00</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openNewCitationModal()">
+          <i class="fa-solid fa-plus-circle"></i> Issue New Citation
+        </button>
+        <button class="btn btn-secondary" onclick="resetDemoData()" title="Re-seed demo database with sample violations">
+          <i class="fa-solid fa-rotate-right"></i> Reset Demo
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="sub-nav">
+    <div class="tabs-container">
+      <button class="tab-link active" data-tab="tab-dashboard" onclick="switchTab('tab-dashboard')">
+        <i class="fa-solid fa-chart-pie"></i> Executive Dashboard
+      </button>
+      <button class="tab-link" data-tab="tab-records" onclick="switchTab('tab-records')">
+        <i class="fa-solid fa-folder-open"></i> Violation Records
+        <span class="tab-counter" id="recordsTabCount">0</span>
+      </button>
+      <button class="tab-link" data-tab="tab-evidence" onclick="switchTab('tab-evidence')">
+        <i class="fa-solid fa-camera-retro"></i> Evidence Review Desk
+      </button>
+      <button class="tab-link" data-tab="tab-adjudication" onclick="switchTab('tab-adjudication')">
+        <i class="fa-solid fa-gavel"></i> Case Outcomes &amp; Hearings
+      </button>
+      <button class="tab-link" data-tab="tab-audit" onclick="switchTab('tab-audit')">
+        <i class="fa-solid fa-clipboard-check"></i> Audit Trail &amp; Logs
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: EXECUTIVE DASHBOARD                 -->
+    <!-- ========================================== -->
+    <section id="tab-dashboard" class="tab-pane active">
+      <div class="dashboard-grid">
+        <!-- Metric Cards -->
+        <div class="card metric-card">
+          <div class="metric-icon blue"><i class="fa-solid fa-file-invoice"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Total Citations Filed</span>
+            <span class="metric-value" id="statTotalCases">0</span>
+            <span class="metric-hint"><i class="fa-solid fa-arrow-trend-up"></i> Registered in jurisdiction</span>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon amber"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Awaiting Evidence Review</span>
+            <span class="metric-value" id="statPendingReview">0</span>
+            <span class="metric-hint"><i class="fa-solid fa-triangle-exclamation"></i> High priority queue</span>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon purple"><i class="fa-solid fa-shield-virus"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Evidence Files Verified</span>
+            <span class="metric-value" id="statVerified">0</span>
+            <span class="metric-hint"><i class="fa-solid fa-check-double"></i> SHA-256 Chain of Custody</span>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon orange"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Hearings &amp; Disputes</span>
+            <span class="metric-value" id="statHearings">0</span>
+            <span class="metric-hint"><i class="fa-solid fa-calendar-day"></i> Docketed for magistrate</span>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon green"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Resolved &amp; Adjudicated</span>
+            <span class="metric-value" id="statResolved">0</span>
+            <span class="metric-hint"><i class="fa-solid fa-square-check"></i> Final dispositions</span>
+          </div>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-icon teal"><i class="fa-solid fa-money-bill-wave"></i></div>
+          <div class="metric-info">
+            <span class="metric-title">Fines Levied vs Collected</span>
+            <div class="fines-duo">
+              <span class="metric-value" id="statFinesCollected">$0</span>
+              <span class="fines-sub">/ <span id="statFinesLevied">$0</span></span>
+            </div>
+            <span class="metric-hint"><i class="fa-solid fa-receipt"></i> Municipal Treasury Sync</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Visual Panels -->
+      <div class="dashboard-panels">
+        <!-- Violation Categories Breakdown -->
+        <div class="card panel-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-column"></i> Violation Breakdown by Category</h3>
+            <span class="badge badge-info">Current Fiscal Quarter</span>
+          </div>
+          <div class="card-body">
+            <div id="violationBreakdownList" class="breakdown-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Status Progression Pipeline -->
+        <div class="card panel-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-diagram-project"></i> Workflow Pipeline &amp; Status</h3>
+            <span class="badge badge-neutral">Stage Tracking</span>
+          </div>
+          <div class="card-body">
+            <div id="statusPipelineList" class="pipeline-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Recent Violations Table -->
+      <div class="card panel-card full-width">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> High-Severity / Recent Citations Requiring Attention</h3>
+          <button class="btn btn-sm btn-secondary" onclick="switchTab('tab-records')">
+            View All Records <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Citation #</th>
+                  <th>Plate / Vehicle</th>
+                  <th>Driver Name</th>
+                  <th>Violation Type</th>
+                  <th>Date &amp; Location</th>
+                  <th>Fine</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: VIOLATION RECORDS DIRECTORY         -->
+    <!-- ========================================== -->
+    <section id="tab-records" class="tab-pane">
+      <div class="card control-bar-card">
+        <div class="search-filter-row">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="recordSearchInput" placeholder="Search by Citation #, License Plate, Driver, Officer, or Location..." oninput="handleSearchInput()">
+            <button class="clear-btn" id="searchClearBtn" onclick="clearSearch()" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <div class="filter-controls">
+            <div class="filter-item">
+              <label><i class="fa-solid fa-filter"></i> Status:</label>
+              <select id="filterStatus" onchange="loadCases()">
+                <option value="ALL">All Statuses</option>
+                <option value="Pending Review">Pending Review</option>
+                <option value="Evidence Verified">Evidence Verified</option>
+                <option value="Hearing Scheduled">Hearing Scheduled</option>
+                <option value="Upheld / Guilty">Upheld / Guilty</option>
+                <option value="Fine Reduced">Fine Reduced</option>
+                <option value="Dismissed">Dismissed</option>
+                <option value="Settled / Paid">Settled / Paid</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label><i class="fa-solid fa-triangle-exclamation"></i> Severity:</label>
+              <select id="filterSeverity" onchange="loadCases()">
+                <option value="ALL">All Severities</option>
+                <option value="Infraction">Infraction</option>
+                <option value="Minor">Minor</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Severe / Misdemeanor">Severe / Misdemeanor</option>
+              </select>
+            </div>
+
+            <button class="btn btn-secondary" onclick="loadCases()">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Records Table -->
+      <div class="card table-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th width="140">Citation #</th>
+                <th width="130">License Plate</th>
+                <th>Driver / Offender</th>
+                <th>Violation Detail</th>
+                <th>Speed Telemetry</th>
+                <th>Date &amp; Time</th>
+                <th>Fine / Points</th>
+                <th>Evidence</th>
+                <th>Status</th>
+                <th width="160">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="casesTableBody">
+              <tr>
+                <td colspan="10" class="text-center py-4">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Loading traffic violation records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="recordsCountText">Showing 0 records</span>
+          <div class="legend-indicators">
+            <span class="legend-badge"><span class="dot dot-amber"></span> Pending Review</span>
+            <span class="legend-badge"><span class="dot dot-blue"></span> Evidence Verified</span>
+            <span class="legend-badge"><span class="dot dot-purple"></span> Hearing Docket</span>
+            <span class="legend-badge"><span class="dot dot-green"></span> Settled / Upheld</span>
+            <span class="legend-badge"><span class="dot dot-slate"></span> Dismissed</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: EVIDENCE REVIEW DESK                -->
+    <!-- ========================================== -->
+    <section id="tab-evidence" class="tab-pane">
+      <div class="evidence-workbench">
+        <!-- Sidebar: Case Selector & Evidence Items -->
+        <div class="evidence-sidebar">
+          <div class="card side-card">
+            <div class="side-card-header">
+              <h4><i class="fa-solid fa-list-check"></i> Select Case Dossier</h4>
+            </div>
+            <div class="side-case-selector">
+              <select id="evidenceCaseSelect" onchange="onEvidenceCaseSelected()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div class="evidence-list-header">
+              <span>Attached Evidence Files (<span id="evidenceCountBadge">0</span>)</span>
+              <button class="btn btn-xs btn-primary" onclick="openAddEvidenceModal()">
+                <i class="fa-solid fa-plus"></i> Add Evidence
+              </button>
+            </div>
+            <div class="evidence-items-scroll" id="evidenceItemsList">
+              <!-- Dynamically populated evidence cards -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Viewer: Inspection & Chain of Custody Analysis -->
+        <div class="evidence-main-view">
+          <div class="card viewer-card">
+            <div class="viewer-header">
+              <div class="viewer-title-group">
+                <span class="evidence-badge-type" id="viewerBadgeType">EVIDENCE FILE</span>
+                <h3 id="viewerTitle">Select an evidence item to inspect</h3>
+                <span class="viewer-meta" id="viewerMeta">Case Citation: --</span>
+              </div>
+              <div class="viewer-actions-top">
+                <button class="btn btn-sm btn-secondary" onclick="openFullscreenEvidence()" title="Expand Image">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Expand
+                </button>
+              </div>
+            </div>
+
+            <!-- Interactive Media Display Pane -->
+            <div class="viewer-media-viewport" id="viewerMediaViewport">
+              <div class="empty-viewport-placeholder">
+                <i class="fa-solid fa-camera-retro fa-3x"></i>
+                <p>Select any evidence file from the dossier list on the left to begin forensic examination.</p>
+              </div>
+            </div>
+
+            <!-- Evidentiary Verification & Integrity Inspector -->
+            <div class="evidence-inspector-drawer" id="evidenceInspectorDrawer" style="display: none;">
+              <div class="inspector-grid">
+                <!-- Chain of Custody & Hash Info -->
+                <div class="inspector-box hash-box">
+                  <div class="box-label"><i class="fa-solid fa-lock"></i> SHA-256 Cryptographic Hash &amp; Integrity:</div>
+                  <div class="hash-string" id="viewerFileHash">--</div>
+                  <div class="hash-status"><i class="fa-solid fa-circle-check text-success"></i> Tamper-evident verification: VALID / UNALTERED</div>
+                </div>
+
+                <!-- Capture Device & Custodian -->
+                <div class="inspector-box">
+                  <div class="box-label"><i class="fa-solid fa-satellite-dish"></i> Sensor / Device &amp; Timestamp:</div>
+                  <div class="meta-row"><span class="meta-lbl">Serial #:</span> <span id="viewerDeviceSerial" class="meta-val">--</span></div>
+                  <div class="meta-row"><span class="meta-lbl">Captured At:</span> <span id="viewerCapturedAt" class="meta-val">--</span></div>
+                  <div class="meta-row"><span class="meta-lbl">Custodian:</span> <span id="viewerCapturedBy" class="meta-val">--</span></div>
+                </div>
+
+                <!-- Analyst Adjudication Controls -->
+                <div class="inspector-box full-span review-controls-box">
+                  <div class="box-label"><i class="fa-solid fa-user-shield"></i> Forensic Analyst Evaluation &amp; Admissibility:</div>
+                  <div class="eval-form-row">
+                    <div class="eval-field">
+                      <label>Admissibility Status:</label>
+                      <select id="evalReviewStatus">
+                        <option value="Verified / Valid">Verified / Valid (Admissible)</option>
+                        <option value="Pending">Pending Evaluation</option>
+                        <option value="Inconclusive">Inconclusive</option>
+                        <option value="Rejected / Inadmissible">Rejected / Inadmissible</option>
+                      </select>
+                    </div>
+
+                    <div class="eval-field">
+                      <label>Evidentiary Strength:</label>
+                      <select id="evalStrength">
+                        <option value="Conclusive">Conclusive (Direct Proof)</option>
+                        <option value="Corroborative">Corroborative (Secondary)</option>
+                        <option value="Circumstantial">Circumstantial</option>
+                        <option value="Inconclusive">Inconclusive</option>
+                      </select>
+                    </div>
+
+                    <div class="eval-field">
+                      <label>Analyst Name:</label>
+                      <input type="text" id="evalAnalystName" value="Senior Investigator Keith Morris">
+                    </div>
+                  </div>
+
+                  <div class="eval-notes-field">
+                    <label>Forensic Review Notes &amp; Findings:</label>
+                    <textarea id="evalNotes" rows="2" placeholder="Record technical notes regarding plate legibility, calibration timestamps, or optical conditions..."></textarea>
+                  </div>
+
+                  <div class="eval-actions">
+                    <button class="btn btn-primary" onclick="submitEvidenceReview()">
+                      <i class="fa-solid fa-floppy-disk"></i> Save Review &amp; Mark Admissible
+                    </button>
+                    <span id="reviewSaveStatus" class="save-indicator"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: CASE OUTCOMES & ADJUDICATION DESK   -->
+    <!-- ========================================== -->
+    <section id="tab-adjudication" class="tab-pane">
+      <div class="adjudication-container">
+        <!-- Docket Selector & Overview -->
+        <div class="card docket-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-scale-balanced"></i> Magistrate Hearing &amp; Adjudication Docket</h3>
+            <div class="header-tools">
+              <span class="badge badge-warning">Judicial &amp; Administrative Review</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="docket-selector-row">
+              <label for="adjudicationCaseSelect"><strong>Select Case to Adjudicate / Review Outcome:</strong></label>
+              <select id="adjudicationCaseSelect" class="form-control" onchange="onAdjudicationCaseSelected()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adjudication Layout (Split: Case Summary on Left, Verdict Recording on Right) -->
+        <div class="adjudication-split" id="adjudicationSplitArea">
+          <!-- Left: Case Summary Dossier -->
+          <div class="card summary-panel">
+            <div class="card-header">
+              <h4><i class="fa-solid fa-id-card"></i> Case Summary Dossier</h4>
+              <span id="docketCitationNumber" class="citation-tag">CIT-XXXX</span>
+            </div>
+            <div class="card-body">
+              <div class="dossier-grid">
+                <div class="dossier-item">
+                  <span class="d-label">Offender Name:</span>
+                  <span class="d-val" id="docketDriverName">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Driver License #:</span>
+                  <span class="d-val font-mono" id="docketDriverLicense">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Vehicle Plate:</span>
+                  <span class="d-val font-mono" id="docketPlate">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Make &amp; Model:</span>
+                  <span class="d-val" id="docketVehicle">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Violation Offense:</span>
+                  <span class="d-val font-bold" id="docketViolation">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Legal Code:</span>
+                  <span class="d-val font-mono text-primary" id="docketCode">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Incident Location:</span>
+                  <span class="d-val" id="docketLocation">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Date &amp; Time:</span>
+                  <span class="d-val" id="docketDate">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Issuing Officer:</span>
+                  <span class="d-val" id="docketOfficer">--</span>
+                </div>
+                <div class="dossier-item">
+                  <span class="d-label">Original Penalty:</span>
+                  <span class="d-val text-danger font-bold" id="docketFine">$0.00</span>
+                </div>
+              </div>
+
+              <!-- Evidence Strength Snapshot for Magistrate -->
+              <div class="magistrate-evidence-box">
+                <div class="m-box-title"><i class="fa-solid fa-shield-halved"></i> Attached Evidence Summary:</div>
+                <ul id="docketEvidenceSummaryList" class="evidence-bullet-list">
+                  <!-- Populated via JS -->
+                </ul>
+              </div>
+
+              <!-- Action button: Print Disposition Sheet -->
+              <div class="mt-4">
+                <button class="btn btn-secondary w-full" onclick="openPrintDispositionModal()">
+                  <i class="fa-solid fa-print"></i> Generate Official Court Disposition Sheet
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Formal Adjudication Ruling Form -->
+          <div class="card outcome-form-panel">
+            <div class="card-header">
+              <h4><i class="fa-solid fa-gavel"></i> Formal Adjudication &amp; Judicial Disposition</h4>
+              <span class="badge" id="adjudicationStatusBadge">Active Hearing</span>
+            </div>
+            <div class="card-body">
+              <form id="adjudicationForm" onsubmit="event.preventDefault(); saveCaseOutcome();">
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label>Adjudication Proceeding Type: *</label>
+                    <select id="formAdjudicationType" required>
+                      <option value="Administrative Review">Administrative Review (Informal)</option>
+                      <option value="Informal Hearing">Informal Hearing (Magistrate Desk)</option>
+                      <option value="Municipal Court Adjudication">Municipal Court Adjudication</option>
+                      <option value="Pre-Trial Settlement">Pre-Trial Settlement / Plea</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Hearing Officer / Judge Name: *</label>
+                    <input type="text" id="formAdjudicatorName" value="Magistrate Linda Morales" required>
+                  </div>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label>Final Case Verdict / Ruling: *</label>
+                    <select id="formVerdict" onchange="onVerdictChanged()" required>
+                      <option value="Citation Upheld (Guilty)">Citation Upheld (Guilty as Charged)</option>
+                      <option value="Fine Reduced">Fine Reduced (Mitigating Factors)</option>
+                      <option value="Dismissed - Insufficient Evidence">Dismissed - Insufficient Evidence</option>
+                      <option value="Dismissed - Equipment Error">Dismissed - Camera / Equipment Error</option>
+                      <option value="Driver Improvement School Assigned">Driver Improvement School Assigned</option>
+                      <option value="Acquitted">Acquitted / Not Responsible</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Date of Hearing / Disposition: *</label>
+                    <input type="date" id="formHearingDate" required>
+                  </div>
+                </div>
+
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label>Original Fine ($):</label>
+                    <input type="number" id="formOriginalFine" readonly class="bg-readonly">
+                  </div>
+                  <div class="form-group">
+                    <label>Adjusted Fine Amount ($): *</label>
+                    <input type="number" id="formAdjustedFine" step="0.01" min="0" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Demerit Points Assessed:</label>
+                    <input type="number" id="formPenaltyPoints" min="0" max="4" value="0">
+                  </div>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label>Settlement / Payment Status: *</label>
+                    <select id="formPaymentStatus" required>
+                      <option value="Pending">Pending Payment</option>
+                      <option value="Paid in Full">Paid in Full</option>
+                      <option value="Installment Plan">Installment Payment Plan</option>
+                      <option value="Waived">Waived / Dismissed</option>
+                      <option value="Defaulted / Collections">Defaulted / Referred to Collections</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Payment / Transaction Reference #:</label>
+                    <input type="text" id="formPaymentReference" placeholder="e.g. TXN-88192-MUNI or PAY-PLAN-01">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Judicial Findings, Legal Grounds &amp; Order Justification: *</label>
+                  <textarea id="formCourtFindings" rows="4" required placeholder="Document the factual basis for the ruling, evidentiary evaluation, mitigating evidence, and statutory considerations..."></textarea>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label>Statutory Appeal Deadline:</label>
+                    <input type="date" id="formAppealDeadline">
+                  </div>
+                  <div class="form-group">
+                    <label>Appeal Status:</label>
+                    <select id="formAppealStatus">
+                      <option value="Not Filed">Not Filed</option>
+                      <option value="Filed">Notice of Appeal Filed</option>
+                      <option value="Under Appeal Review">Under Appellate Review</option>
+                      <option value="Appeal Denied">Appeal Denied (Affirmed)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-actions-right">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-gavel"></i> Formalize Adjudication Disposition
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: AUDIT TRAIL & LOGS                  -->
+    <!-- ========================================== -->
+    <section id="tab-audit" class="tab-pane">
+      <div class="card panel-card full-width">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-clipboard-list"></i> Municipal Traffic Enforcement Audit Log &amp; Chain of Custody</h3>
+          <span class="badge badge-info">Tamper-Evident Chronological Ledger</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th width="80">Log #</th>
+                  <th width="160">Timestamp</th>
+                  <th width="140">Case Citation</th>
+                  <th width="160">Action Event</th>
+                  <th width="180">Officer / Actor</th>
+                  <th>Action Details &amp; Findings</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogsTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
+
+  <!-- 1. New Citation Modal -->
+  <div class="modal-overlay" id="newCitationModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-circle-plus"></i> Issue New Traffic Violation Citation</h3>
+        <button class="modal-close-btn" onclick="closeModal('newCitationModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newCitationForm" onsubmit="event.preventDefault(); submitNewCitation();">
+          
+          <div class="section-title"><i class="fa-solid fa-car"></i> Vehicle Identification</div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>License Plate: *</label>
+              <input type="text" id="newPlate" required placeholder="e.g. 7XYZ982" style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+              <label>State / Jurisdiction:</label>
+              <select id="newState">
+                <option value="CA" selected>California (CA)</option>
+                <option value="WA">Washington (WA)</option>
+                <option value="NV">Nevada (NV)</option>
+                <option value="OR">Oregon (OR)</option>
+                <option value="AZ">Arizona (AZ)</option>
+                <option value="TX">Texas (TX)</option>
+                <option value="NY">New York (NY)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Vehicle Make &amp; Model:</label>
+              <input type="text" id="newMakeModel" placeholder="e.g. Tesla Model Y">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Vehicle Color:</label>
+              <input type="text" id="newColor" placeholder="e.g. Midnight Silver">
+            </div>
+            <div class="form-group">
+              <label>Citation Number (Optional):</label>
+              <input type="text" id="newCitationNum" placeholder="Leave empty for auto-generated CIT-2026-XXXX">
+            </div>
+          </div>
+
+          <div class="section-title"><i class="fa-solid fa-user"></i> Offender / Driver Information</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Driver Full Name: *</label>
+              <input type="text" id="newDriverName" required placeholder="e.g. Marcus Vance">
+            </div>
+            <div class="form-group">
+              <label>Driver License Number: *</label>
+              <input type="text" id="newDriverLicense" required placeholder="e.g. D4928172" style="text-transform: uppercase;">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Phone Number:</label>
+              <input type="tel" id="newDriverPhone" placeholder="(555) 000-0000">
+            </div>
+            <div class="form-group">
+              <label>Email Address:</label>
+              <input type="email" id="newDriverEmail" placeholder="driver@example.com">
+            </div>
+          </div>
+
+          <div class="section-title"><i class="fa-solid fa-traffic-light"></i> Violation &amp; Location Details</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Violation Offense Category: *</label>
+              <select id="newViolationPreset" onchange="applyViolationPreset()" required>
+                <option value="">-- Select Offense Preset --</option>
+                <option value="Speeding (1-15 mph over)|VC-22349(b)|238|1|Moderate">Speeding: 1-15 mph over limit ($238 / 1 pt)</option>
+                <option value="Speeding (16-25 mph over)|VC-22349(a)|385|1|Moderate">Speeding: 16-25 mph over limit ($385 / 1 pt)</option>
+                <option value="Excessive Speeding (100+ mph)|VC-22348(b)|1800|2|Severe / Misdemeanor">Excessive Speeding: 100+ mph ($1,800 / 2 pts)</option>
+                <option value="Red Light Running (Automated Camera)|VC-21453(a)|490|1|Moderate">Red Light Running: Automated Camera ($490 / 1 pt)</option>
+                <option value="School Zone Speeding|VC-22358.4|520|1|Moderate">School Zone Excessive Speeding ($520 / 1 pt)</option>
+                <option value="Reckless Driving / Endangerment|VC-23103|1250|2|Severe / Misdemeanor">Reckless Driving / Endangerment ($1,250 / 2 pts)</option>
+                <option value="Cell Phone Operation while Driving|VC-23123.5|162|0|Infraction">Cell Phone Operation While Driving ($162 / 0 pts)</option>
+                <option value="Failure to Obey Regulatory Sign / Turn|VC-21461|238|1|Minor">Failure to Obey Regulatory Sign ($238 / 1 pt)</option>
+                <option value="Custom">Custom Violation Entry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Violation Code: *</label>
+              <input type="text" id="newViolationCode" required placeholder="e.g. VC-22349(a)">
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Speed Recorded (MPH):</label>
+              <input type="number" id="newSpeedRecorded" placeholder="e.g. 89">
+            </div>
+            <div class="form-group">
+              <label>Posted Speed Limit (MPH):</label>
+              <input type="number" id="newSpeedLimit" placeholder="e.g. 65">
+            </div>
+            <div class="form-group">
+              <label>Severity Level: *</label>
+              <select id="newSeverity">
+                <option value="Infraction">Infraction</option>
+                <option value="Minor">Minor</option>
+                <option value="Moderate" selected>Moderate</option>
+                <option value="Severe / Misdemeanor">Severe / Misdemeanor</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Incident Location: *</label>
+              <input type="text" id="newLocation" required placeholder="e.g. Interstate 280 NB at Page Mill Rd">
+            </div>
+            <div class="form-group">
+              <label>Incident Date &amp; Time: *</label>
+              <input type="datetime-local" id="newViolationDate" required>
+            </div>
+          </div>
+
+          <div class="section-title"><i class="fa-solid fa-shield-halved"></i> Enforcement Officer &amp; Fines</div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Officer Name: *</label>
+              <input type="text" id="newOfficerName" required value="Officer David Chen">
+            </div>
+            <div class="form-group">
+              <label>Officer Badge #: *</label>
+              <input type="text" id="newOfficerBadge" required value="BADGE-4182">
+            </div>
+            <div class="form-group">
+              <label>Department:</label>
+              <input type="text" id="newDepartment" value="Highway Patrol Division">
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Fine Amount ($): *</label>
+              <input type="number" id="newFineAmount" step="0.01" min="0" required value="385.00">
+            </div>
+            <div class="form-group">
+              <label>Demerit Points:</label>
+              <input type="number" id="newDemeritPoints" min="0" max="4" value="1">
+            </div>
+            <div class="form-group">
+              <label>Initial Status:</label>
+              <select id="newStatus">
+                <option value="Pending Review">Pending Review</option>
+                <option value="Evidence Verified">Evidence Verified</option>
+                <option value="Hearing Scheduled">Hearing Scheduled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Officer Narrative &amp; Notes:</label>
+            <textarea id="newNotes" rows="2" placeholder="Describe environmental conditions, traffic density, radar calibration checks..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('newCitationModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Register Citation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Add Evidence Modal -->
+  <div class="modal-overlay" id="addEvidenceModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cloud-arrow-up"></i> Upload / Attach Forensic Evidence</h3>
+        <button class="modal-close-btn" onclick="closeModal('addEvidenceModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addEvidenceForm" onsubmit="event.preventDefault(); submitNewEvidence();">
+          <input type="hidden" id="evidenceTargetCaseId">
+
+          <div class="form-group">
+            <label>Case Citation Reference:</label>
+            <input type="text" id="evidenceTargetCitation" readonly class="bg-readonly">
+          </div>
+
+          <div class="form-group">
+            <label>Evidence Title: *</label>
+            <input type="text" id="evidenceTitle" required placeholder="e.g. Automated High-Speed Camera Capture">
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Evidence Category: *</label>
+              <select id="evidenceType" required>
+                <option value="Speed Camera Photo">Speed Camera Photo</option>
+                <option value="Red Light Camera Photo">Red Light Camera Photo</option>
+                <option value="Dashcam Video Simulation">Dashcam Video Simulation</option>
+                <option value="Radar Calibration Log">Radar / Lidar Calibration Log</option>
+                <option value="Officer Incident Statement">Officer Incident Statement</option>
+                <option value="Scene Photo">Scene / Obstruction Photo</option>
+                <option value="Breathalyzer Report">Breathalyzer / Forensic Test</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Capture Device / Sensor ID:</label>
+              <input type="text" id="evidenceDevice" placeholder="e.g. STALKER-DSR-8819">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>File Upload (Image, Video, PDF):</label>
+            <input type="file" id="evidenceFileInput" class="file-input">
+            <small class="text-muted">Or select a simulated pre-rendered evidence asset below:</small>
+            <select id="evidencePresetAsset" class="mt-2" onchange="onPresetAssetSelected()">
+              <option value="">-- Use Custom Uploaded File Above --</option>
+              <option value="/static/assets/evidence_speed_7xyz982.svg|image">Highway Speed Camera HUD (89 MPH / Plate 7XYZ982)</option>
+              <option value="/static/assets/evidence_redlight_6abc321.svg|image">Red Light Violation Stop Line Frame (+0.82s / 6ABC321)</option>
+              <option value="/static/assets/evidence_radar_cert.svg|document">Official Bureau of Metrology Radar Certificate</option>
+              <option value="/static/assets/evidence_dashcam_sim.svg|video">Sensor Trajectory Timeline Simulation</option>
+              <option value="/static/assets/evidence_dashcam_reckless.svg|video">Cruiser 704 Dashcam Target Lock (104 MPH)</option>
+              <option value="/static/assets/evidence_schoolzone.svg|image">School Zone Beacon Speed Telemetry (44 MPH)</option>
+              <option value="/static/assets/evidence_obscured_sign.svg|image">Overgrown Foliage Obscured Sign Photo</option>
+            </select>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Custodian / Ingested By: *</label>
+              <input type="text" id="evidenceCapturedBy" required value="System Ingest Pipeline">
+            </div>
+            <div class="form-group">
+              <label>Initial Evidentiary Strength:</label>
+              <select id="evidenceInitialStrength">
+                <option value="Conclusive">Conclusive (Direct Proof)</option>
+                <option value="Corroborative" selected>Corroborative</option>
+                <option value="Circumstantial">Circumstantial</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Detailed Description &amp; Context:</label>
+            <textarea id="evidenceDescription" rows="2" placeholder="Specify capture angle, ambient lighting, radar Doppler lock frequency, OCR score..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addEvidenceModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Attach &amp; Hash Evidence</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Case 360 Details Modal -->
+  <div class="modal-overlay" id="caseDetailModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-header">
+        <div class="d-flex align-center gap-3">
+          <span class="badge badge-primary font-mono text-base" id="modalCitationTitle">CIT-XXXX</span>
+          <span class="badge" id="modalStatusBadge">STATUS</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('caseDetailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="caseDetailModalBody">
+        <!-- Dynamically loaded -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Printable Official Court Disposition Modal -->
+  <div class="modal-overlay" id="printDispositionModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-shield"></i> Official Citation &amp; Case Disposition Sheet</h3>
+        <div class="modal-tools">
+          <button class="btn btn-sm btn-primary" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Print Document
+          </button>
+          <button class="modal-close-btn" onclick="closeModal('printDispositionModal')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body print-area" id="printSheetBody">
+        <!-- Formatted legal sheet populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

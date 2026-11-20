@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1329"/>
+      <stop offset="60%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e2430"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Sky & Environment -->
+  <rect width="800" height="300" fill="url(#skyGrad)"/>
+  <rect y="300" width="800" height="200" fill="url(#roadGrad)"/>
+
+  <!-- Distant Highway Horizon & Mountains -->
+  <polygon points="0,300 120,250 280,280 450,240 620,270 800,250 800,300" fill="#0f172a" opacity="0.8"/>
+
+  <!-- Road & Highway Lanes (I-280 Perspective) -->
+  <polygon points="260,300 540,300 800,500 0,500" fill="#1e222d"/>
+  <!-- Lane lines -->
+  <polygon points="395,300 405,300 408,500 392,500" fill="#facc15" opacity="0.6"/>
+  <line x1="330" y1="300" x2="160" y2="500" stroke="#ffffff" stroke-width="3" stroke-dasharray="15,15" opacity="0.7"/>
+  <line x1="470" y1="300" x2="640" y2="500" stroke="#ffffff" stroke-width="3" stroke-dasharray="15,15" opacity="0.7"/>
+
+  <!-- Gantry Overhead Structure -->
+  <rect x="0" y="40" width="800" height="14" fill="#475569"/>
+  <rect x="0" y="54" width="800" height="4" fill="#334155"/>
+  <line x1="120" y1="58" x2="120" y2="300" stroke="#475569" stroke-width="8"/>
+  <line x1="680" y1="58" x2="680" y2="300" stroke="#475569" stroke-width="8"/>
+
+  <!-- Target Vehicle (Tesla Model Y Midnight Silver) -->
+  <g transform="translate(360, 310)">
+    <!-- Shadow -->
+    <ellipse cx="60" cy="115" rx="80" ry="12" fill="#000000" opacity="0.7"/>
+    <!-- Car Body -->
+    <path d="M 10,85 C 15,65 30,50 50,45 C 70,40 100,40 120,50 C 130,55 135,70 135,85 L 138,105 C 138,110 132,112 120,112 L 5,112 C -5,112 -5,108 0,102 Z" fill="#334155"/>
+    <path d="M 22,65 Q 60,48 105,52 L 122,70 L 15,70 Z" fill="#0f172a" opacity="0.9"/>
+    <!-- Taillights -->
+    <rect x="8" y="85" width="22" height="7" rx="2" fill="#ef4444" filter="url(#glow)"/>
+    <rect x="95" y="85" width="22" height="7" rx="2" fill="#ef4444" filter="url(#glow)"/>
+    <!-- License Plate Holder -->
+    <rect x="42" y="90" width="40" height="18" rx="2" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+    <text x="62" y="103" font-family="monospace" font-weight="bold" font-size="9" fill="#0f172a" text-anchor="middle">7XYZ982</text>
+  </g>
+
+  <!-- Automated Speed Camera Telemetry HUD Box -->
+  <rect x="330" y="270" width="180" height="170" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="8,4"/>
+  <!-- Corner Reticles -->
+  <path d="M 330,285 L 330,270 L 345,270" fill="none" stroke="#ef4444" stroke-width="3"/>
+  <path d="M 495,270 L 510,270 L 510,285" fill="none" stroke="#ef4444" stroke-width="3"/>
+  <path d="M 330,425 L 330,440 L 345,440" fill="none" stroke="#ef4444" stroke-width="3"/>
+  <path d="M 495,440 L 510,440 L 510,425" fill="none" stroke="#ef4444" stroke-width="3"/>
+
+  <!-- Target Tracking HUD Banner -->
+  <rect x="330" y="244" width="180" height="24" rx="4" fill="#ef4444"/>
+  <text x="420" y="260" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">TARGET LOCKED: 89 MPH</text>
+
+  <!-- Top Left Telemetry Overlay -->
+  <rect x="20" y="20" width="310" height="100" rx="6" fill="#0f172a" opacity="0.88" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="32" y="42" font-family="'Segoe UI', monospace" font-size="11" fill="#38bdf8" font-weight="bold">SYSTEM: STALKER DSR 2X HIGHWAY GANTRY</text>
+  <text x="32" y="60" font-family="'Segoe UI', monospace" font-size="11" fill="#94a3b8">LOC: I-280 NB @ PAGE MILL RD (MP 24.8)</text>
+  <text x="32" y="78" font-family="'Segoe UI', monospace" font-size="11" fill="#cbd5e1">TIME: 2026-11-14 08:42:11.402 PST</text>
+  <text x="32" y="96" font-family="'Segoe UI', monospace" font-size="11" fill="#cbd5e1">LIMIT: <tspan fill="#e2e8f0" font-weight="bold">65 MPH</tspan> | MEASURED: <tspan fill="#f87171" font-weight="bold">89 MPH (+24)</tspan></text>
+  <text x="32" y="112" font-family="'Segoe UI', monospace" font-size="10" fill="#4ade80">RADAR FREQ: 34.700 GHz (Ka-BAND) - VERIFIED</text>
+
+  <!-- Inset: OCR Plate Magnification -->
+  <g transform="translate(560, 20)">
+    <rect width="220" height="150" rx="6" fill="#0f172a" opacity="0.95" stroke="#e2e8f0" stroke-width="2"/>
+    <rect x="10" y="10" width="200" height="24" rx="4" fill="#1e293b"/>
+    <text x="110" y="26" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">OCR RECOGNITION CROP</text>
+    
+    <!-- Magnified Plate Graphic -->
+    <rect x="25" y="45" width="170" height="70" rx="6" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+    <text x="110" y="60" font-family="'Arial', sans-serif" font-weight="bold" font-size="10" fill="#dc2626" text-anchor="middle">CALIFORNIA</text>
+    <text x="110" y="95" font-family="'Courier New', monospace" font-weight="900" font-size="30" fill="#1e293b" text-anchor="middle" letter-spacing="4">7XYZ982</text>
+    
+    <text x="110" y="132" font-family="'Segoe UI', sans-serif" font-size="10" fill="#4ade80" font-weight="bold" text-anchor="middle">MATCH CONFIDENCE: 99.4%</text>
+    <text x="110" y="144" font-family="'Segoe UI', sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">SHA-256 INTEGRITY VALID</text>
+  </g>
+
+  <!-- Bottom Verification Stamp -->
+  <rect x="20" y="440" width="280" height="40" rx="4" fill="#0f172a" opacity="0.85" stroke="#22c55e" stroke-width="1.2"/>
+  <circle cx="40" cy="460" r="12" fill="#22c55e" opacity="0.2"/>
+  <path d="M 34,460 L 38,464 L 47,455" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <text x="60" y="456" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" fill="#22c55e">EVIDENTIARY AUDIT SEAL: SECURE</text>
+  <text x="60" y="471" font-family="monospace" font-size="9" fill="#94a3b8">HASH: D9A4-F61E-8093-1456</text>
+</svg>

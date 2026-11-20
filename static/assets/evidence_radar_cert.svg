@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <!-- Paper Certificate Background -->
+  <rect width="800" height="500" fill="#f8fafc"/>
+  <rect x="25" y="25" width="750" height="450" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+  <rect x="35" y="35" width="730" height="430" rx="4" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Official State Seal Graphic -->
+  <g transform="translate(400, 95)">
+    <circle cx="0" cy="0" r="32" fill="#f1f5f9" stroke="#0284c7" stroke-width="2"/>
+    <polygon points="0,-22 6,-6 22,-6 10,4 14,20 0,10 -14,20 -10,4 -22,-6 -6,-6" fill="#0284c7" opacity="0.8"/>
+  </g>
+
+  <!-- Certificate Heading -->
+  <text x="400" y="145" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#0f172a" text-anchor="middle" letter-spacing="1.5">DEPARTMENT OF PUBLIC SAFETY &amp; METROLOGY</text>
+  <text x="400" y="168" font-family="'Times New Roman', serif" font-style="italic" font-size="14" fill="#475569" text-anchor="middle">CERTIFICATE OF RADAR / LIDAR ACCURACY &amp; CALIBRATION</text>
+
+  <line x1="120" y1="180" x2="680" y2="180" stroke="#0284c7" stroke-width="2"/>
+
+  <!-- Instrument Specifications -->
+  <g transform="translate(100, 200)">
+    <text x="0" y="20" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#334155">EQUIPMENT MODEL:</text>
+    <text x="170" y="20" font-family="'Segoe UI', sans-serif" font-size="12" fill="#0f172a">Stalker DSR 2X Ka-Band Moving Doppler Radar</text>
+
+    <text x="0" y="45" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#334155">SERIAL NUMBER:</text>
+    <text x="170" y="45" font-family="'Segoe UI', sans-serif" font-size="12" fill="#0f172a">STK-8819-CAL-99120</text>
+
+    <text x="0" y="70" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#334155">CERTIFICATION DATE:</text>
+    <text x="170" y="70" font-family="'Segoe UI', sans-serif" font-size="12" fill="#0f172a">October 01, 2026 (Valid Through: Oct 01, 2027)</text>
+
+    <text x="0" y="95" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#334155">TUNING FORK TESTS:</text>
+    <text x="170" y="95" font-family="'Segoe UI', sans-serif" font-size="12" fill="#0f172a">Low Fork (35 MPH): 35.0 MPH  |  High Fork (65 MPH): 65.0 MPH</text>
+
+    <text x="0" y="120" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#334155">OPERATIONAL DRIFT:</text>
+    <text x="170" y="120" font-family="'Segoe UI', sans-serif" font-size="12" fill="#16a34a" font-weight="bold">0.00 MPH (Absolute Zero Tolerance Compliant)</text>
+  </g>
+
+  <!-- Certification Box / Seal -->
+  <g transform="translate(520, 280)">
+    <rect width="180" height="90" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="90" y="30" font-family="'Segoe UI', sans-serif" font-weight="900" font-size="14" fill="#16a34a" text-anchor="middle">CALIBRATION PASSED</text>
+    <text x="90" y="52" font-family="'Segoe UI', sans-serif" font-size="11" fill="#15803d" text-anchor="middle">LEGAL EVIDENTIARY GRADE</text>
+    <text x="90" y="72" font-family="monospace" font-size="9" fill="#475569" text-anchor="middle">NIST TRACEABLE #49281-B</text>
+  </g>
+
+  <!-- Signatures -->
+  <g transform="translate(100, 390)">
+    <!-- Signature Line 1 -->
+    <line x1="0" y1="0" x2="220" y2="0" stroke="#64748b" stroke-width="1.5"/>
+    <text x="0" y="-10" font-family="'Brush Script MT', cursive, sans-serif" font-size="20" fill="#1e293b">Harold M. Sterling</text>
+    <text x="0" y="16" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" fill="#475569">Harold Sterling, Lead Metrologist</text>
+
+    <!-- Signature Line 2 -->
+    <line x1="360" y1="0" x2="580" y2="0" stroke="#64748b" stroke-width="1.5"/>
+    <text x="360" y="-10" font-family="'Brush Script MT', cursive, sans-serif" font-size="20" fill="#1e293b">Diane K. Westcott</text>
+    <text x="360" y="16" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" fill="#475569">Diane Westcott, Enforcement Commander</text>
+  </g>
+</svg>
